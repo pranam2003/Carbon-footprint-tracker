@@ -1,5 +1,5 @@
 import Activity from "../models/Activity.js";
-import { carbonChat, getPersonalizedSuggestions } from "../services/gemini.js";
+import { carbonChat, getPersonalizedSuggestions, getPatternSuggestions } from "../services/gemini.js";
 
 export const getTips = (req, res) => {
   res.json({
@@ -62,5 +62,31 @@ export const getSuggestions = async (req, res) => {
         "Recycle waste properly",
       ],
     });
+  }
+
+};
+
+export const getPatternStats = async (req, res) => {
+  try {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 30);
+
+   
+    const activities = await Activity.find({
+      user: req.user.id,
+      createdAt: { $gte: twoWeeksAgo },
+    }).sort({ createdAt: -1 });
+
+    if (activities.length < 5) {
+      
+      return res.json({ suggestion: null });
+    }
+
+    const suggestion = await getPatternSuggestions(activities);
+
+    res.json({ suggestion });
+  } catch (error) {
+    console.error("Error fetching AI suggestions:", error);
+    res.status(500).json({ message: "Failed to fetch suggestions" });
   }
 };

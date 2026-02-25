@@ -1,10 +1,12 @@
 import express from "express";
-import { getTips, chat, getSuggestions } from "../controllers/aiController.js";
+import { chat, getSuggestions, getTips, getPatternStats } from "../controllers/aiController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-router.get("/", protect, getTips);
+
 router.post("/chat", protect, chat);
+router.get("/tips", protect, getTips);
 router.get("/suggestions", protect, getSuggestions);
+router.get("/pattern-suggestions", protect, getPatternStats);
 
 export default router;

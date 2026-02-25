@@ -1,6 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/db.js";
@@ -9,6 +11,7 @@ import activityRoutes from "./routes/activityRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import rewardsRoutes from "./routes/rewardsRoutes.js";
 import scheduleDailyReminders from "./jobs/dailyReminder.js";
+import scheduleAutoWasteCreator from "./jobs/autoWaste.js";
 
 dotenv.config();
 
@@ -27,6 +30,7 @@ const startServer = async () => {
     await connectDB();
 
     scheduleDailyReminders();
+    scheduleAutoWasteCreator();
     app.listen(5000, () => console.log("Server running on port 5000"));
   } catch (err) {
     console.error("Failed to start server:", err.message);
