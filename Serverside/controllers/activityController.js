@@ -197,3 +197,30 @@ export const getPatternStats = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch suggestions" });
   }
 };
+
+export const deleteActivity = async (req, res) => {
+  try {
+    const activity = await Activity.findOne({
+      _id: req.params.id,
+      user: req.user.id,
+    });
+
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // Check if same day
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    if (new Date(activity.createdAt) < startOfToday) {
+      return res.status(400).json({ message: "Activities can only be deleted on the same day they were created." });
+    }
+
+    await Activity.findByIdAndDelete(activity._id);
+    res.json({ message: "Activity deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting activity:", error);
+    res.status(500).json({ message: "Failed to delete activity" });
+  }
+};

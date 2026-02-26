@@ -16,8 +16,8 @@ export const register = async (req, res) => {
         return res.status(400).json({ message: "User already exists" });
       } else {
         // User exists but is not verified. Resend verification email.
-        const verificationToken = crypto.randomBytes(32).toString("hex");
-        const verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationTokenExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
 
         // Update user details
         const hashed = await bcrypt.hash(password, 10);
@@ -30,13 +30,13 @@ export const register = async (req, res) => {
         await sendVerificationEmail(existingUser.email, verificationToken);
 
         return res.status(200).json({
-          message: "Verification email resent. Please check your inbox.",
+          message: "Verification code sent to your email. Please check your inbox.",
         });
       }
     }
 
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    const verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationTokenExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({
@@ -51,7 +51,7 @@ export const register = async (req, res) => {
     await sendVerificationEmail(user.email, verificationToken);
 
     res.status(201).json({
-      message: "Registration successful. Please check your email to verify your account.",
+      message: "Verification code sent to your email. Please verify your account.",
     });
   } catch (error) {
     res.status(500).json({ message: "Registration failed", error: error.message });
@@ -179,7 +179,7 @@ export const verifyEmail = async (req, res) => {
     user.verificationTokenExpires = undefined;
     await user.save();
 
-    res.json({ message: "Email verified successfully. You can now login." });
+    res.json({ message: "Registered successfully! You can now login." });
   } catch (error) {
     res.status(500).json({ message: "Verification failed", error: error.message });
   }

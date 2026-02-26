@@ -9,7 +9,7 @@ const scheduleDailyReminders = () => {
 
  
   cron.schedule(
-    "10 11 * * *",
+    "03 12 * * *",
     async () => {
       const now = new Date();
       const startOfDay = new Date(now);
